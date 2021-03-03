@@ -24,7 +24,13 @@
         <a-icon type="sync" spin class="message-loading-icon" />
       </div>
     </transition>
-    <div class="message-main" :style="{ opacity: messageOpacity }">
+      <!-- 群公告 -->
+    <template v-if="groupGather[activeRoom.groupId] && messageOpacity">
+      <a-alert ref="notification" class="message-notification" banner closable :description="activeRoom.notice" show-icon>
+        <a-icon slot="icon" type="notification" />
+      </a-alert>
+    </template>
+    <div class="message-main" :style="{ opacity: messageOpacity}">
       <div class="message-content">
         <transition name="noData">
           <div class="message-content-noData" v-if="isNoData">没有更多消息了~</div>
@@ -48,8 +54,14 @@
               <div class="message-content-text" v-text="_parseText(item.content)" v-else-if="item.messageType === 'text'"></div>
               <div class="message-content-image" v-if="item.messageType === 'image'" :style="getImageStyle(item.content)">
                 <viewer style="display:flex;align-items:center;">
-                  <img :src="'api/static/image/' + item.content" alt="" />
+                  <img :src="apiUrl + '/static/image/' + item.content" alt="" />
                 </viewer>
+              </div>
+              <!-- 视频格式文件 -->
+              <div class="message-content-image" v-if="item.messageType === 'video'">
+                <video :src="apiUrl + '/static/file/' + item.content" controls="controls">
+                  您的浏览器不支持 video 标签。
+                </video>
               </div>
               <!-- 附件类型消息 -->
               <div class="message-content-file" v-else-if="item.messageType === 'file'" @click="download(item)">
@@ -119,6 +131,8 @@ export default class Message extends Vue {
   @chatModule.Mutation('set_friend_messages') set_friend_messages: Function;
 
   @chatModule.Mutation('set_user_gather') set_user_gather: Function;
+
+  @appModule.Getter('apiUrl') apiUrl: string;
 
   text: string = '';
 
@@ -190,7 +204,7 @@ export default class Message extends Vue {
   download(message: FriendMessage & GroupMessage) {
     const a = document.createElement('a');
     a.id = '__downloadFile__';
-    a.href = `${FILE_SAVE_PATH}${message.content}`;
+    a.href = `${this.apiUrl}${FILE_SAVE_PATH}${message.content}`;
     a.setAttribute('target', '__blank');
     document.body.append(a);
     a.click();
@@ -454,6 +468,8 @@ export default class Message extends Vue {
   overflow: hidden;
   height: 100%;
   position: relative;
+  display: flex;
+  flex-direction: column;
   background: $message-bg-color;
   .message-header {
     height: 60px;
@@ -474,15 +490,14 @@ export default class Message extends Vue {
   }
   .message-loading {
     position: absolute;
-    left: calc(50% - 18px);
-    top: 60px;
-    z-index: 99;
+    top: 2px;
+    right: 50px;
+    z-index: 199;
     .message-loading-icon {
       margin: 10px auto;
       font-size: 20px;
       padding: 8px;
-      border-radius: 50%;
-      background-color: rgb(0, 0, 0, 0.8);
+      color:#2b2b2b;
     }
   }
   // 移动端样式
@@ -492,9 +507,16 @@ export default class Message extends Vue {
     }
   }
   .message-main {
-    height: calc(100% - 240px);
     overflow: auto;
+      flex:1;
     position: relative;
+    .message-notification{
+      ::v-deep .ant-alert-description{
+        text-align: left;
+        max-height: 22px;
+        overflow: auto;
+      }
+  }
     .message-content {
       .message-content-noData {
         line-height: 50px;
@@ -570,23 +592,6 @@ export default class Message extends Vue {
           justify-content: flex-end;
         }
       }
-    }
-  }
-  .message-input {
-    display: flex;
-    flex-wrap: nowrap;
-    position: absolute;
-    width: 100%;
-    bottom: 0px;
-    input {
-      height: 40px;
-    }
-    .message-input-button {
-      width: 30px;
-      cursor: pointer;
-      position: absolute;
-      right: 10px;
-      top: 4px;
     }
   }
 }
