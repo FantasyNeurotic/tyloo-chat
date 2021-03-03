@@ -7,11 +7,10 @@ https://github.com/electron-userland/electron-builder/issues/4305
 1. 打包客户端程序
 ```js
   // client
-  npm i
+  cnpm i  // 建议不要使用npm i 容易鬼畜安装失败
   npm run build // 根据本地系统自动打包相应安装包 (windows则会打成exe,mac则为dmg)
   npm run build:win32 // win32版本
   npm run build:win64 // win64版本
-  npm run build:mac // mac版本
   // 更多参数命令参考官网 https://www.electron.build/cli
   Building:
   --mac, -m, -o, --macos   Build for macOS, accepts target list (see
@@ -57,6 +56,8 @@ https://github.com/electron-userland/electron-builder/issues/4305
 ```
 
 ## 部署后端服务
+
+**后台服务默认端口号为`3000`有需要自行修改 main.ts文件**
 - 方式一(整个项目拷贝至服务器)
   1. 安装 pm2
   ```js
@@ -81,4 +82,8 @@ https://github.com/electron-userland/electron-builder/issues/4305
 
   ## 其他注意事项
 
-  如果在CentOS上部署出现libc.so.6版本过低,考虑是系统环境问题,升级版本.
+  - 如果在CentOS上部署出现libc.so.6版本过低,考虑是系统环境问题,升级版本
+
+  - 后端服务器注意安全策略中放行`3000`端口
+
+  - 加qq群..
