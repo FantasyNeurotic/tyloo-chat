@@ -16,6 +16,7 @@ import { md5 } from 'src/common/tool/utils'
 import { RCode } from 'src/common/constant/rcode'
 import * as jwt from 'jsonwebtoken'
 import { jwtConstants } from './constants'
+import { UserLogin } from '../../interfaces/user-login'
 @Injectable()
 export class AuthService {
   constructor(
@@ -30,17 +31,18 @@ export class AuthService {
     private readonly jwtService: JwtService
   ) {}
 
-  async login(data: User): Promise<any> {
-    let user
+  async login(data: UserLogin): Promise<any> {
+    let user: Partial<User>
     // 如果之前传userId 表示为单点登录,直接登录
     if (data.userId && !data.password) {
       user = await this.userRepository.findOne({ userId: data.userId })
       // 如果当前不存在该用户,自动注册,初始密码为 123456
       if (!user) {
-        const res = this.register({
+        user = {
           ...data,
           password: defaultPassword
-        })
+        }
+        const res = this.register(user)
         return res
       }
     } else {
@@ -62,7 +64,7 @@ export class AuthService {
     }
   }
 
-  async register(user: User): Promise<any> {
+  async register(user: Partial<User>): Promise<any> {
     const isHave = await this.userRepository.find({ username: user.username })
     if (isHave.length) {
       return { code: RCode.FAIL, msg: '用户名重复', data: '' }

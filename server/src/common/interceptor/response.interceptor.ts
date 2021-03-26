@@ -13,6 +13,7 @@ export class ResponseInterceptor implements NestInterceptor {
     context: ExecutionContext,
     next: CallHandler<any>
   ): import('rxjs').Observable<any> | Promise<import('rxjs').Observable<any>> {
+    console.log('=--', context)
     return next.handle().pipe(
       map(content => {
         return {

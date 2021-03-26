@@ -7,13 +7,13 @@ import {
   Patch,
   Delete,
   UseInterceptors,
-  UploadedFile,
   UseGuards,
-  Req
+  Req,
+  UploadedFile
 } from '@nestjs/common'
+import { FileInterceptor } from '@webundsoehne/nest-fastify-file-upload'
 import { UserService } from './user.service'
 import { AuthService } from './../auth/auth.service'
-import { FileInterceptor } from '@nestjs/platform-express'
 import { AuthGuard } from '@nestjs/passport'
 
 @Controller('user')

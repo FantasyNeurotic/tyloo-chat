@@ -36,10 +36,7 @@ import { defaultPassword } from 'src/common/constant/global'
 import { UseGuards } from '@nestjs/common'
 import { User } from './../user/entity/user.entity'
 import { WsJwtGuard } from './../../common/guards/WsJwtGuard'
-const axios = require('axios')
-
-// const axios = require('axios');
-const fs = require('fs')
+import * as rp from 'request-promise'
 
 @WebSocketGateway()
 export class ChatGateway {
@@ -497,7 +494,7 @@ export class ChatGateway {
   async autoReply(data, roomId) {
     const url =
       'http://i.itpk.cn/api.php?api_key=68b8fafef36d3906f8f8b0e71b29d277&api_secret=4rdiunvqd0xw'
-    const res = await axios({
+    const res = await rp({
       url,
       method: 'get',
       params: {
